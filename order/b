@@ -1,0 +1,43 @@
+<?php
+// required headers
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Max-Age: 3600");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
+// get database connection
+include_once '../config/database.php';
+
+// instantiate varianstock object
+include_once '../objects/order.php';
+
+$database = new Database();
+$db = $database->getConnection();
+
+$order = new Order($db);
+
+// get posted data
+$data = json_decode(file_get_contents("php://input"));
+
+// set varianstock property values
+$order->sales_id = $data->sales_id;
+$order->date_time = $data->date_time;
+
+$order_arr = array(
+	"sales_id" => $order->sales_id,
+	"date_time" => $order->date_time
+);
+
+// create the varianstock
+if($order->create()){
+	echo json_encode($order_arr);
+}
+
+// if unable to create the varianstock, tell the varianstock
+else{
+	echo '{';
+		echo '"message": "Unable to create varianstock."';
+	echo '}';
+}
+?>
